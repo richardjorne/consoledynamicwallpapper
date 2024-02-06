@@ -2,6 +2,8 @@
 //  https://mczachurski.dev
 //  Copyright © 2021 Marcin Czachurski and the repository contributors.
 //  Licensed under the MIT License.
+//  Modified by © 2024 Richard Jorne.
+//  https://
 //
 
 import Foundation
@@ -12,21 +14,19 @@ public class WallpaperGenerator {
     
     public init() {
     }
-
-    public func generate(pictureInfos: [PictureInfo], baseURL: URL, outputFileName: String) throws {
+    
+    public func generate(pictureInfos: [PictureInfo], outputFileDir: String) throws {
         let consoleIO = ConsoleIO()
         let options = [kCGImageDestinationLossyCompressionQuality: 1.0]
-        
-        if #available(OSX 10.13, *) {
-            
+                    
             let imageMetadataGenerator = ImageMetadataGenerator(pictureInfos: pictureInfos)
             let imageMetadata = try imageMetadataGenerator.getImageMetadata()
-            let images = imageMetadataGenerator.images
+            let images = imageMetadataGenerator.imageDirs()
             
             let destinationData = NSMutableData()
-            if let destination = CGImageDestinationCreateWithData(destinationData, AVFileType.heic as CFString, images.count, nil) {
-                for (index, fileName) in images.enumerated() {
-                    let fileURL = URL(fileURLWithPath: fileName, relativeTo: baseURL)
+        if let destination = CGImageDestinationCreateWithData(destinationData, AVFileType.heic as CFString, images.count, nil) {
+            for (index, fileName) in images.enumerated() {
+                let fileURL = URL(fileURLWithPath: fileName)
 
                     consoleIO.writeMessage("Reading image file: '\(fileURL.absoluteString)'...", to: .debug)
                     guard let orginalImage = NSImage(contentsOf: fileURL) else {
@@ -55,14 +55,11 @@ public class WallpaperGenerator {
                 }
                 consoleIO.writeMessage("OK.\n", to: .debug)
 
-                let outputURL = URL(fileURLWithPath: outputFileName)
+                let outputURL = URL(fileURLWithPath: outputFileDir)
                 consoleIO.writeMessage("Saving data to file '\(outputURL.absoluteString)'...", to: .debug)
                 let imageData = destinationData as Data
                 try imageData.write(to: outputURL)
                 consoleIO.writeMessage("OK.\n", to: .debug)
             }
-        } else {
-            throw ImageMetadataGeneratorError.notSupportedSystem
-        }
     }
 }

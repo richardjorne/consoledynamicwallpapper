@@ -2,6 +2,9 @@
 //  https://mczachurski.dev
 //  Copyright © 2021 Marcin Czachurski and the repository contributors.
 //  Licensed under the MIT License.
+//  Modified by © 2024 Richard Jorne.
+//  https://
+//  Licensed under the MIT License.
 //
 
 import Foundation
@@ -10,17 +13,18 @@ import ImageIO
 public class ImageMetadataGenerator {
     private let pictureInfos: [PictureInfo]
     
-    public lazy var images: [String] = {
-        let sordedPictureInfors = pictureInfos.sorted(by: { (left, right) -> Bool in
+    public func imageDirs() -> [String] { // Changing to function
+        let sortedPictureInfors = pictureInfos.sorted(by: { (left, right) -> Bool in
             return left.isPrimary == true
         })
         
-        let sortedFileNames = sordedPictureInfors.map { pictureInfo -> String in
-            pictureInfo.fileName
+        let sortedFileNames: [String] = sortedPictureInfors.map {
+            $0.fileName
         }
         var addedDict = [String: Bool]()
         return sortedFileNames.filter { addedDict.updateValue(true, forKey: $0) == nil }
-    }()
+    }
+    
     
     init(pictureInfos: [PictureInfo]) {
         self.pictureInfos = pictureInfos
@@ -123,6 +127,6 @@ public class ImageMetadataGenerator {
     }
     
     private func getImageIndex(fileName: String) -> Int {
-        return self.images.firstIndex(of: fileName) ?? 0
+        return self.imageDirs().firstIndex(of: fileName) ?? 0
     }
 }

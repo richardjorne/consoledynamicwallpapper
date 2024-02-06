@@ -44,10 +44,9 @@ class Program {
             let pictureInfos = try decoder.decode([PictureInfo].self, from: inputFileContents)
             self.consoleIO.writeMessage("OK (\(pictureInfos.count) pictures).\n", to: .debug)
 
-            let baseURL = fileURL.deletingLastPathComponent()
             let wallpaperGenerator = WallpaperGenerator()
             let fileName = self.outputFileName ?? "output.heic"
-            try wallpaperGenerator.generate(pictureInfos: pictureInfos, baseURL: baseURL, outputFileName: fileName);
+            try wallpaperGenerator.generate(pictureInfos: pictureInfos, outputFileDir: fileName);
         } catch (let error as WallpapperError) {
             self.consoleIO.writeMessage("Unexpected error occurs: \(error.message)", to: .error)
             return false

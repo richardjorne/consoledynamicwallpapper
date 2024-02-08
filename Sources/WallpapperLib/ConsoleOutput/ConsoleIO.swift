@@ -16,7 +16,7 @@ public class ConsoleIO {
         case .standard:
             print(message)
         case .debug:
-            fputs("\(message)", stdout)
+            fputs("\(message)\n", stdout)
             fflush(stdout)
         case .error:
             fputs("Error: \(message)\n", stderr)

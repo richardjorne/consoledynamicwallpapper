@@ -15,7 +15,7 @@ public class WallpaperGenerator {
     public init() {
     }
     
-    public func generate(pictureInfos: [PictureInfo], outputFileDir: String) throws {
+    public func generate(pictureInfos: [PictureInfo], pictures: [NSImage], outputFileDir: String) throws -> URL? {
         let consoleIO = ConsoleIO()
         let options = [kCGImageDestinationLossyCompressionQuality: 1.0]
                     
@@ -25,18 +25,22 @@ public class WallpaperGenerator {
             
             let destinationData = NSMutableData()
         if let destination = CGImageDestinationCreateWithData(destinationData, AVFileType.heic as CFString, images.count, nil) {
-            for (index, fileName) in images.enumerated() {
-                let fileURL = URL(fileURLWithPath: fileName)
-
-                    consoleIO.writeMessage("Reading image file: '\(fileURL.absoluteString)'...", to: .debug)
-                    guard let orginalImage = NSImage(contentsOf: fileURL) else {
-                        consoleIO.writeMessage("ERROR.\n", to: .debug)
-                        return
-                    }
+            for (index, _) in images.enumerated() {
+//                let fileURL = URL(fileURLWithPath: fileName)
+//                guard let fileURL = URL(string: fileName) else {
+//                    consoleIO.writeMessage("Image URL Invalid: '\(fileName)'.\n", to: .debug)
+//                    throw DalpperErrors.imageURLInvalid(urlString: fileName)
+//                }
+//                    consoleIO.writeMessage("Reading image file: '\(fileURL.absoluteString)'...", to: .debug)
+//                    guard let orginalImage = NSImage(contentsOf: fileURL) else {
+//                        consoleIO.writeMessage("ERROR.\n", to: .debug)
+//                        throw DalpperErrors.imageLoadFailed(urlString: fileName)
+//                    }
+                let originalImage = pictures[index]
 
                     consoleIO.writeMessage("OK.\n", to: .debug)
 
-                    if let cgImage = orginalImage.CGImage {
+                    if let cgImage = originalImage.CGImage {
                         if index == 0 {
                             consoleIO.writeMessage("Adding image and metadata...", to: .debug)
                             CGImageDestinationAddImageAndMetadata(destination, cgImage, imageMetadata, options as CFDictionary)
@@ -60,6 +64,8 @@ public class WallpaperGenerator {
                 let imageData = destinationData as Data
                 try imageData.write(to: outputURL)
                 consoleIO.writeMessage("OK.\n", to: .debug)
+            return outputURL
             }
+        return nil
     }
 }
